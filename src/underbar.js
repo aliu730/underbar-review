@@ -265,7 +265,15 @@
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
+  _.defaults = function(obj, ...args) {
+    for (var i = 0; i < args.length; i++) {
+      for (var key in args[i]) {
+        if (obj[key] === undefined) {
+          obj[key] = args[i][key];
+        }
+      } 
+    }
+    return obj;
   };
 
 
@@ -309,6 +317,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    // declare an object as as storage container
+    var storage = {};
+    return function() {
+      var args = JSON.stringify(arguments);
+      if (storage[args] === undefined) {
+        storage[args] = func.apply(this, arguments);
+      }
+      return storage[args];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -317,7 +334,11 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function(func, wait) {
+  _.delay = function(func, wait, ...args) {
+    //Use settimeout passing in func with args
+    return setTimeout(function() {
+      func(...args)
+    }, wait); 
   };
 
 
@@ -332,6 +353,21 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    //use a storage container
+    //copy the original array and store it in another variable
+    //Use a loop if it copy array still has elements.
+      //Define a variable with random index with math.random w/floor
+      //Using the random index store it in storage
+      //Delete from copy array the element at that "random index"
+    //return storage
+    var resultArray = [];
+    var copy = array.slice();
+    while (copy.length !== 0) {
+      var randomIndex = Math.floor(Math.random()*copy.length);
+      resultArray.push(copy[randomIndex]);
+      copy.splice(randomIndex, 1);
+    }
+    return resultArray;
   };
 
 
